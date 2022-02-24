@@ -66,6 +66,9 @@ Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
 #List information on a specific certificate in a key vault
 Get-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName
 
+#Enable or Disable a certificate
+Update-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName -Enable $false -PassThru
+
 #Get expiration date of certs in keyvault
 $keyVaultCerts = Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
 $keyVaultCerts | Select Name, Expires
