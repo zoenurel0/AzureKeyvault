@@ -45,90 +45,112 @@
 $azKeyvaultName = 'teaKeyvaultEng' #Set your keyvault name here before continuing.
 $certificateName = 'name1'
 
+#General commands
 
-#List all commands in Az.Keyvault module
-Get-Command -Module az.keyvault
+      #List all commands in Az.Keyvault module
+      Get-Command -Module az.keyvault
+      Get-Module -ListAvailable
+#
 
-Get-Module -ListAvailable
+#Vault Operations
 
-#List all keyvaults in a subscription
-Get-AzKeyVault
+      #List all keyvaults in a subscription
+      Get-AzKeyVault
 
-#Get a specific keyvault
-Get-AzKeyVault -VaultName $azKeyvaultName
+      #Get a specific keyvault
+      Get-AzKeyVault -VaultName $azKeyvaultName
 
-#Get Keyvault Secrets
-Get-AzKeyVaultSecret -VaultName $azKeyvaultName
+      #View Certificate contacts for a keyvault
+      Get-AzKeyVaultCertificateContact -VaultName $azKeyvaultName
 
-#List all certificates within a vault
-Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
+#
 
-#List information on a specific certificate in a key vault
-Get-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName
+#Certificate Operations
 
-#Enable or Disable a certificate
-Update-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName -Enable $false -PassThru
+      #List all certificates within a vault
+      Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
 
-#Get expiration date of certs in keyvault
-$keyVaultCerts = Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
-$keyVaultCerts | Select Name, Expires
+      #List information on a specific certificate in a key vault
+      Get-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName
 
-#Retrieve key (Allows cert operations for certificates)
-Get-AzKeyVaultKey -VaultName $azKeyvaultName
+      #Enable or Disable a certificate
+      Update-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name $certificateName -Enable $false -PassThru
 
-#View Certificate Polices
-Get-AzKeyVaultCertificatePolicy -VaultName $azKeyvaultName -Name $certificateName
+      #Get expiration date of certs in keyvault
+      $keyVaultCerts = Get-AzKeyVaultCertificate -VaultName $azKeyvaultName
+      $keyVaultCerts | Select Name, Expires
 
-#View Certificate contacts for a keyvault
-Get-AzKeyVaultCertificateContact -VaultName $azKeyvaultName
+      #Remove a certificate from keyvault store
+      Remove-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name 'name1' -Force
 
-#Create or update a secret (basically a password)
-$securePassword = ConvertTo-SecureString -AsPlainText -String 'PlainTextPasswordForCertificates' 
-Set-AzKeyVaultSecret -Name OATICertPassword -SecretValue $securePassword -VaultName $azKeyvaultName
+      #Import Certificate
 
-#Retrieve secret value in plain text
-Get-AzKeyVaultSecret -Name 'OATICertPassword' -VaultName $azKeyvaultName -AsPlainText
+      <#
+      Import-AzureKeyVaultCertificate
+            [-VaultName] <String>
+            [-Name] <String>
+            -FilePath <String>
+            [-Password <SecureString>]
+            [-Tag <Hashtable>]
+            [-DefaultProfile <IAzureContextContainer>]
+            [-WhatIf]
+            [-Confirm]
+            [<CommonParameters>]
+      #>
 
-#Disable Certificate Issuance Policy (Not certificate!)
-Set-AzKeyVaultCertificatePolicy -VaultName $azKeyvaultName -Name $certificateName -Disabled
-
-#Import Certificate
-
-<#
-Import-AzureKeyVaultCertificate
-      [-VaultName] <String>
-      [-Name] <String>
-      -FilePath <String>
-      [-Password <SecureString>]
-      [-Tag <Hashtable>]
-      [-DefaultProfile <IAzureContextContainer>]
-      [-WhatIf]
-      [-Confirm]
-      [<CommonParameters>]
-#>
-
-[string]$certificatePassword = '1234Pass'
+      [string]$certificatePassword = '1234Pass'
 
 
-# Import-AzKeyVaultCertificate uses SecureString for password
-[securestring]$secStringPassword = ConvertTo-SecureString $certificatePassword -AsPlainText -Force
+      # Import-AzKeyVaultCertificate uses SecureString for password
+      [securestring]$secStringPassword = ConvertTo-SecureString $certificatePassword -AsPlainText -Force
 
-[securestring]$secStringPassword = Get-AzKeyVaultSecret -Name 'OATICertPassword' -VaultName $azKeyvaultName -AsPlainText | ConvertTo-SecureString -AsPlainText -Force
+      [securestring]$secStringPassword = Get-AzKeyVaultSecret -Name 'OATICertPassword' -VaultName $azKeyvaultName -AsPlainText | ConvertTo-SecureString -AsPlainText -Force
 
-[String]$certPath = 'C:\Temp\POS_OASIS.pfx' #'C:\Scripts\AzureKeyvaultExamples$certificateNametestcert.pfx'
-            
-[String]$certName = 'PSO-OASIS'
+      [String]$certPath = 'C:\Temp\POS_OASIS.pfx' #'C:\Scripts\AzureKeyvaultExamples$certificateNametestcert.pfx'
+                  
+      [String]$certName = 'PSO-OASIS'
 
 
-$param = @{
-      VaultName = $azKeyvaultName
-      Name = $certName 
-      FilePath = $certPath
-      Password = $secStringPassword
-}
+      $param = @{
+            VaultName = $azKeyvaultName
+            Name = $certName 
+            FilePath = $certPath
+            Password = $secStringPassword
+      }
 
-Import-AzKeyVaultCertificate @param
+      Import-AzKeyVaultCertificate @param
 
+#
+
+
+#Certificate Policy Operations
+
+      #View Certificate Polices
+      Get-AzKeyVaultCertificatePolicy -VaultName $azKeyvaultName -Name $certificateName
+
+      #Disable Certificate Issuance Policy (Not certificate!)
+      Set-AzKeyVaultCertificatePolicy -VaultName $azKeyvaultName -Name $certificateName -Disabled
+#
+
+#Secret Operations
+
+      #Get Keyvault Secrets
+      Get-AzKeyVaultSecret -VaultName $azKeyvaultName
+
+      #Create or update a secret (basically a password)
+      $securePassword = ConvertTo-SecureString -AsPlainText -String 'PlainTextPasswordForCertificates' 
+      Set-AzKeyVaultSecret -Name OATICertPassword -SecretValue $securePassword -VaultName $azKeyvaultName
+
+      #Retrieve secret value in plain text
+      Get-AzKeyVaultSecret -Name 'OATICertPassword' -VaultName $azKeyvaultName -AsPlainText
+#
+
+#Key Operations
+
+      #Retrieve key (Allows cert operations for certificates)
+      Get-AzKeyVaultKey -VaultName $azKeyvaultName
+
+#
 
 
 
@@ -138,3 +160,4 @@ while ($true) {
 
       sleep -Seconds 2
 }
+#
