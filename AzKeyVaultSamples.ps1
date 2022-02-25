@@ -13,6 +13,12 @@
       Security:
             https://docs.microsoft.com/en-us/azure/key-vault/general/security-features
 
+      Integration with CA providers (Issuers)
+            https://docs.microsoft.com/en-us/azure/key-vault/certificates/how-to-integrate-certificate-authority
+      
+      Key Vault docs reference:
+            https://docs.microsoft.com/en-us/azure/key-vault/certificates/
+
 #>
 
 
@@ -106,7 +112,7 @@ $certificateName = 'name1'
 
       [securestring]$secStringPassword = Get-AzKeyVaultSecret -Name 'OATICertPassword' -VaultName $azKeyvaultName -AsPlainText | ConvertTo-SecureString -AsPlainText -Force
 
-      [String]$certPath = 'C:\Temp\POS_OASIS.pfx' #'C:\Scripts\AzureKeyvaultExamples$certificateNametestcert.pfx'
+      [String]$certPath = 'C:\git\AzureKeyvault\name1-testcert.pfx' #'C:\Scripts\AzureKeyvaultExamples$certificateNametestcert.pfx'
                   
       [String]$certName = 'PSO-OASIS'
 
@@ -130,6 +136,9 @@ $certificateName = 'name1'
 
       #Disable Certificate Issuance Policy (Not certificate!)
       Set-AzKeyVaultCertificatePolicy -VaultName $azKeyvaultName -Name $certificateName -Disabled
+
+      #Create an in memory certificate policy object. This will be bound to a certificate.
+      New-AzKeyVaultCertificatePolicy
 #
 
 #Secret Operations
