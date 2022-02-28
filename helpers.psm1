@@ -30,14 +30,62 @@ Function New-BulkTestCerts {
 
         $securePassword = ConvertTo-SecureString -String $PlainTestPassword -AsPlainText 
 
-        $newCertificate| Export-PfxCertificate -Password $securePassword -FilePath "$ExportDirectory\$fullCertName.pfx" | Out-Null
+        $newCertificate | Export-PfxCertificate -Password $securePassword -FilePath "$ExportDirectory\$fullCertName.pfx" | Out-Null
         
     
         $i += 1
     }
     
-    
+    <#Examples:
+
+New-BulkTestCerts -Quantity 10 -ExportDirectory C:\temp -PlainTestPassword 1234   
+
+#>    
 
 }
 
+Function Import-AzureKeyvaultPFXCertificates {
 
+    [CmdletBinding()]
+    Param(
+        [String]$ImportDirectory = 'C:\temp',
+        [Parameter(Mandatory=$true)]
+        [String]$PlainTestPassword,
+        [Parameter(Mandatory=$true)]
+        [String]$KeyvaultName = 'teaKeyvaultEng'
+    )
+
+
+    $pfxCerts = Get-ChildItem -Path $ImportDirectory -Filter *.pfx
+
+    # Import-AzKeyVaultCertificate uses SecureString for password
+    [securestring]$secStringPassword = ConvertTo-SecureString $PlainTestPassword -AsPlainText -Force
+    
+    if ($pfxCerts.Count -gt 0) {
+    
+        foreach ($pfxCertificate in $pfxCerts) {
+            $pfxCertificate.FullName
+    
+            [String]$certFullPath = $pfxCertificate.FullName
+            [String]$certName = $pfxCertificate.BaseName
+    
+            $param = @{
+                VaultName = $KeyvaultName
+                Name      = $certName 
+                FilePath  = $certFullPath
+                Password  = $secStringPassword
+            }
+    
+            #$param
+    
+            Import-AzKeyVaultCertificate @param
+        } 
+    }
+    else {
+        Write-Output "No PFX certificates found in location $ImportDirectory"
+        Break
+    }
+    
+    
+
+}

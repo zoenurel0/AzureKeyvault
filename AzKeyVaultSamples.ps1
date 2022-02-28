@@ -89,6 +89,8 @@ $certificateName = 'name1'
       #Remove a certificate from keyvault store
       Remove-AzKeyVaultCertificate -VaultName $azKeyvaultName -Name 'name1' -Force
 
+      Get-AzKeyVaultCertificate -VaultName $KeyvaultName | ?{$_.Name -match 'default'} | Remove-AzKeyVaultCertificate -Force
+
       #Import Certificate
 
       <#
