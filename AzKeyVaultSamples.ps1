@@ -80,6 +80,7 @@ $certificateName = 'name1'
             
             Add-AzKeyVaultNetworkRule -VaultName $azKeyvaultName -IpAddressRange $ipPrefixes -PassThru
             
+            Update-AzKeyVaultNetworkRuleSet -VaultName $azKeyvaultName -DefaultAction Deny -Bypass AzureServices
             
             #Remove existing network ACLs from a Keyvault
             $existingNetworkACLs = ((Get-AzKeyVault -VaultName $azKeyvaultName).NetworkAcls).IpAddressRanges
