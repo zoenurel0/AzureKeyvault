@@ -69,6 +69,30 @@ $certificateName = 'name1'
       #View Certificate contacts for a keyvault
       Get-AzKeyVaultCertificateContact -VaultName $azKeyvaultName
 
+      #Modify Network ACL rules
+      
+            #Add Firewall ACL rule to Keyvault
+            [String[]]$ipPrefixes = @(
+                  '38.101.156.0/23',
+                  '50.59.206.0/24',
+                  '4.35.241.246/32'
+            )
+            
+            Add-AzKeyVaultNetworkRule -VaultName $azKeyvaultName -IpAddressRange $ipPrefixes -PassThru
+            
+            
+            #Remove existing network ACLs from a Keyvault
+            $existingNetworkACLs = ((Get-AzKeyVault -VaultName $azKeyvaultName).NetworkAcls).IpAddressRanges
+            
+            if ($existingNetworkACLs.Count -gt 0)
+            {
+                  Remove-AzKeyVaultNetworkRule -VaultName $azKeyvaultName -IpAddressRange $existingNetworkACLs -PassThru
+            }
+            else {
+                  "No ACL's exist on keyvault!"
+            }
+            
+
 #
 
 #Certificate Operations
